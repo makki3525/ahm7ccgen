@@ -209,8 +209,8 @@
   </div>
 
   <footer>
-        <button onclick="toggleTheme()">Toggle Theme</button>
-		<p>Made with Love by Muhammad Makki</p>
+    <button onclick="toggleTheme()">Toggle Theme</button>
+    <p>Made with Love by Muhammad Makki</p>
   </footer>
 
   <script>
@@ -235,7 +235,7 @@
       const bin = document.getElementById('binInput').value;
       const quantity = parseInt(document.getElementById('quantityBinInput').value) || 10;
       const month = document.getElementById('monthInput').value || String(Math.floor(Math.random() * 12 + 1)).padStart(2, '0');
-      const year = document.getElementById('yearInput').value || '24';
+      const year = document.getElementById('yearInput').value || String(Math.floor(Math.random() * 10 + 2025)); // Full year (2025–2034)
       const cvv = document.getElementById('cvvInput').value || String(Math.floor(Math.random() * 1000)).padStart(3, '0');
       const resultDiv = document.getElementById('result');
 
@@ -245,11 +245,13 @@
       }
 
       document.getElementById('errorMessage').innerText = '';
-      resultDiv.innerHTML = '';  // Clear existing results before generating new ones
+      resultDiv.innerHTML = ''; // Clear existing results before generating new ones
 
       for (let i = 0; i < quantity; i++) {
         const cardNumber = generateCard(bin);
-        resultDiv.innerHTML += `<div>${cardNumber}|${month}|${year}|${cvv} <button onclick="copyToClipboard('${cardNumber}|${month}|${year}|${cvv}')">Copy</button></div>`;
+        if (validateLuhn(cardNumber)) {
+          resultDiv.innerHTML += `<div>${cardNumber}|${month}|${year}|${cvv} <button onclick="copyToClipboard('${cardNumber}|${month}|${year}|${cvv}')">Copy</button></div>`;
+        }
       }
     }
 
@@ -257,48 +259,102 @@
     function generateRandom() {
       const quantity = parseInt(document.getElementById('quantityRandomInput').value) || 10;
       const resultDiv = document.getElementById('result');
-      const bins = ['411111', '555555', '601151', '371449']; // Multiple BINs
-
-      resultDiv.innerHTML = '';  // Clear existing results before generating new ones
+      resultDiv.innerHTML = ''; // Clear existing results before generating new ones
 
       for (let i = 0; i < quantity; i++) {
-        const bin = bins[Math.floor(Math.random() * bins.length)];
+        const bin = getRandomBin();
         const cardNumber = generateCard(bin);
         const month = String(Math.floor(Math.random() * 12 + 1)).padStart(2, '0');
-        const year = '24';
+        const year = String(Math.floor(Math.random() * 10 + 2025)); // Full year (2025–2034)
         const cvv = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
-        resultDiv.innerHTML += `<div>${cardNumber}|${month}|${year}|${cvv} <button onclick="copyToClipboard('${cardNumber}|${month}|${year}|${cvv}')">Copy</button></div>`;
+        if (validateLuhn(cardNumber)) {
+          resultDiv.innerHTML += `<div>${cardNumber}|${month}|${year}|${cvv} <button onclick="copyToClipboard('${cardNumber}|${month}|${year}|${cvv}')">Copy</button></div>`;
+        }
       }
     }
 
-    // Function to generate card number based on BIN
-    function generateCard(bin) {
-      const randomNum = Math.floor(Math.random() * 1000000000000000);
-      return bin + randomNum.toString().padStart(16 - bin.length, '0');
+    // Function to validate card number using Luhn algorithm
+    function validateLuhn(cardNumber) {
+      let sum = 0;
+      let alternate = false;
+
+      for (let i = cardNumber.length - 1; i >= 0; i--) {
+        let digit = parseInt(cardNumber[i], 10);
+
+        if (alternate) {
+          digit *= 2;
+          if (digit > 9) {
+            digit -= 9;
+          }
+        }
+
+        sum += digit;
+        alternate = !alternate;
+      }
+
+      return sum % 10 === 0;
     }
 
-    // Function to clear results
+    // Generate card number from BIN
+    function generateCard(bin) {
+      let cardNumber = bin;
+      while (cardNumber.length < 15) {
+        cardNumber += Math.floor(Math.random() * 10);
+      }
+      return cardNumber + calculateCheckDigit(cardNumber);
+    }
+
+    // Calculate the Luhn check digit
+    function calculateCheckDigit(cardNumber) {
+      let sum = 0;
+      let alternate = true;
+
+      for (let i = cardNumber.length - 1; i >= 0; i--) {
+        let digit = parseInt(cardNumber[i], 10);
+
+        if (alternate) {
+          digit *= 2;
+          if (digit > 9) {
+            digit -= 9;
+          }
+        }
+
+        sum += digit;
+        alternate = !alternate;
+      }
+
+      const checkDigit = (10 - (sum % 10)) % 10;
+      return checkDigit;
+    }
+
+    // Generate random BIN
+    function getRandomBin() {
+      const bins = ['411111', '555555', '601100', '379999'];
+      return bins[Math.floor(Math.random() * bins.length)];
+    }
+
+    // Copy to clipboard
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard!');
+      });
+    }
+
+    // Copy all results
+    function copyAll() {
+      const resultText = Array.from(document.getElementById('result').children)
+        .map(item => item.textContent.trim())
+        .join('\n');
+      navigator.clipboard.writeText(resultText).then(() => {
+        alert('All results copied to clipboard!');
+      });
+    }
+
+    // Clear results
     function clearResults() {
       document.getElementById('result').innerHTML = '';
     }
-
-    // Function to copy content to clipboard
-    function copyToClipboard(content) {
-      const textArea = document.createElement('textarea');
-      textArea.value = content;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-    }
-
-    // Function to copy all results
-    function copyAll() {
-      const resultDiv = document.getElementById('result');
-      const allText = resultDiv.innerText;
-      copyToClipboard(allText);
-    }
   </script>
 </body>
-  </html>
-      
+	</html>
+ 
