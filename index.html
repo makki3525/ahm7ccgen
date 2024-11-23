@@ -25,6 +25,16 @@
       --link-color: #16a085;
     }
 
+    .blue-theme {
+      --background-color: #f0f8ff;
+      --text-color: #2c3e50;
+      --button-bg: #8e44ad;
+      --button-hover: #732d91;
+      --input-bg: #dcdde1;
+      --border-color: #8e44ad;
+      --link-color: #2980b9;
+    }
+
     body {
       font-family: Arial, sans-serif;
       background: var(--background-color);
@@ -94,22 +104,6 @@
       border-radius: 5px;
     }
 
-    .links {
-      margin: 20px 0;
-      text-align: center;
-    }
-
-    .links a {
-      color: var(--link-color);
-      text-decoration: none;
-      font-size: 16px;
-      margin: 0 10px;
-    }
-
-    .links a:hover {
-      text-decoration: underline;
-    }
-
     footer {
       margin-top: 20px;
       font-size: 16px;
@@ -121,61 +115,9 @@
       font-size: 14px;
       margin: 10px 0;
     }
-
-    /* Popup Styling */
-    .popup {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      color: var(--text-color);
-      z-index: 1000;
-      text-align: center;
-      padding-top: 20vh;
-    }
-
-    .popup-content {
-      background: var(--background-color);
-      padding: 20px;
-      border-radius: 10px;
-      display: inline-block;
-      text-align: center;
-    }
-
-    .popup a {
-      display: block;
-      margin: 10px 0;
-      color: var(--link-color);
-      font-size: 18px;
-    }
-
-    .popup button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      background: var(--button-bg);
-      color: var(--text-color);
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-
-    .popup button:hover {
-      background: var(--button-hover);
-    }
   </style>
 </head>
 <body>
-  <div class="popup" id="welcomePopup">
-    <div class="popup-content">
-      <h2>Welcome to AHM7CCGENERATOR</h2>
-      <p>We recommend you join our channel to access exclusive tools:</p>
-      <a href="https://whatsapp.com/channel/0029VaOqbIr2P59sgcIri51d" target="_blank" onclick="showJoined()">Join WhatsApp Channel</a>
-    </div>
-  </div>
-
   <header>
     <h1>AHM7CCGENERATOR</h1>
   </header>
@@ -187,174 +129,148 @@
     <input type="number" id="monthInput" placeholder="MM (1-12)" min="1" max="12">
     <input type="number" id="yearInput" placeholder="YY (24+)" min="24">
     <input type="text" id="cvvInput" placeholder="CVV (e.g., 123)">
-    <button onclick="generateFromBin()">Generate</button>
+    <button id="generateBinButton">Generate</button>
   </div>
 
   <div class="form-group">
     <h3>Generate Random</h3>
     <input type="number" id="quantityRandomInput" placeholder="Quantity (1-100)" min="1" max="100">
-    <button onclick="generateRandom()">Generate</button>
-    <button onclick="clearResults()">Clear Results</button>
-    <button onclick="copyAll()">Copy All</button>
+    <button id="generateRandomButton">Generate</button>
+    <button id="clearResultsButton">Clear Results</button>
+    <button id="copyAllButton">Copy All</button>
   </div>
 
   <div id="errorMessage" class="error"></div>
   <div class="result" id="result"></div>
 
-  <div class="links">
-    <p>Join Our Channels:</p>
-    <a href="https://whatsapp.com/channel/0029VaOqbIr2P59sgcIri51d" target="_blank">WhatsApp Channel</a>
-    <a href="https://t.me/+uDM12rJJFEtmMzBk" target="_blank">Telegram Channel</a>
-    <p><a href="https://t.me/TextAHM_bot" target="_blank">Contact Us on Telegram</a></p>
-  </div>
-
   <footer>
-    <button onclick="toggleTheme()">Toggle Theme</button>
+    <button id="toggleThemeButton">Toggle Theme</button>
     <p>Made with Love by Muhammad Makki</p>
   </footer>
 
   <script>
-    // Check for popup dismissal
-    if (!localStorage.getItem('popupDismissed')) {
-      document.getElementById('welcomePopup').style.display = 'block';
-    }
+    let currentTheme = 0; // Tracks the current theme: 0 = dark, 1 = light, 2 = blue
 
-    // Dismiss the popup after clicking the channel link
-    function showJoined() {
-      localStorage.setItem('popupDismissed', 'true');
-      document.getElementById('welcomePopup').style.display = 'none';
-    }
+    document.getElementById("toggleThemeButton").addEventListener("click", toggleTheme);
+    document.getElementById("generateBinButton").addEventListener("click", generateFromBin);
+    document.getElementById("generateRandomButton").addEventListener("click", generateRandom);
+    document.getElementById("clearResultsButton").addEventListener("click", clearResults);
+    document.getElementById("copyAllButton").addEventListener("click", copyAll);
 
-    // Function to toggle themes
     function toggleTheme() {
-      document.body.classList.toggle('light-theme');
+      const themes = ["", "light-theme", "blue-theme"];
+      document.body.className = themes[++currentTheme % themes.length];
     }
 
-    // Function to generate cards from BIN
     function generateFromBin() {
-      const bin = document.getElementById('binInput').value;
-      const quantity = parseInt(document.getElementById('quantityBinInput').value) || 10;
-      const month = document.getElementById('monthInput').value || String(Math.floor(Math.random() * 12 + 1)).padStart(2, '0');
-      const year = document.getElementById('yearInput').value || String(Math.floor(Math.random() * 10 + 2025)); // Full year (2025–2034)
-      const cvv = document.getElementById('cvvInput').value || String(Math.floor(Math.random() * 1000)).padStart(3, '0');
-      const resultDiv = document.getElementById('result');
+      const bin = document.getElementById("binInput").value.trim();
+      const quantity = parseInt(document.getElementById("quantityBinInput").value) || 10;
+      const month = document.getElementById("monthInput").value.padStart(2, "0") || getRandomMonth();
+      const year = document.getElementById("yearInput").value || getRandomYear();
+      const cvv = document.getElementById("cvvInput").value.padStart(3, "0") || getRandomCVV();
 
       if (!bin || bin.length < 6) {
-        document.getElementById('errorMessage').innerText = 'Please enter a valid BIN (at least 6 digits)';
+        showError("BIN must be at least 6 digits.");
         return;
       }
 
-      document.getElementById('errorMessage').innerText = '';
-      resultDiv.innerHTML = ''; // Clear existing results before generating new ones
-
+      clearError();
+      let result = "";
       for (let i = 0; i < quantity; i++) {
         const cardNumber = generateCard(bin);
         if (validateLuhn(cardNumber)) {
-          resultDiv.innerHTML += `<div>${cardNumber}|${month}|${year}|${cvv} <button onclick="copyToClipboard('${cardNumber}|${month}|${year}|${cvv}')">Copy</button></div>`;
+          result += `<div>${cardNumber}|${month}|${year}|${cvv} <button onclick="copy('${cardNumber}|${month}|${year}|${cvv}')">Copy</button></div>`;
         }
       }
+      document.getElementById("result").innerHTML = result;
     }
 
-    // Function to generate random card
     function generateRandom() {
-      const quantity = parseInt(document.getElementById('quantityRandomInput').value) || 10;
-      const resultDiv = document.getElementById('result');
-      resultDiv.innerHTML = ''; // Clear existing results before generating new ones
-
+      const quantity = parseInt(document.getElementById("quantityRandomInput").value) || 10;
+      let result = "";
       for (let i = 0; i < quantity; i++) {
         const bin = getRandomBin();
         const cardNumber = generateCard(bin);
-        const month = String(Math.floor(Math.random() * 12 + 1)).padStart(2, '0');
-        const year = String(Math.floor(Math.random() * 10 + 2025)); // Full year (2025–2034)
-        const cvv = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+        const month = getRandomMonth();
+        const year = getRandomYear();
+        const cvv = getRandomCVV();
         if (validateLuhn(cardNumber)) {
-          resultDiv.innerHTML += `<div>${cardNumber}|${month}|${year}|${cvv} <button onclick="copyToClipboard('${cardNumber}|${month}|${year}|${cvv}')">Copy</button></div>`;
+          result += `<div>${cardNumber}|${month}|${year}|${cvv} <button onclick="copy('${cardNumber}|${month}|${year}|${cvv}')">Copy</button></div>`;
         }
       }
+      document.getElementById("result").innerHTML = result;
     }
 
-    // Function to validate card number using Luhn algorithm
     function validateLuhn(cardNumber) {
-      let sum = 0;
-      let alternate = false;
-
+      let sum = 0, alt = false;
       for (let i = cardNumber.length - 1; i >= 0; i--) {
-        let digit = parseInt(cardNumber[i], 10);
-
-        if (alternate) {
-          digit *= 2;
-          if (digit > 9) {
-            digit -= 9;
-          }
-        }
-
+        let digit = parseInt(cardNumber[i]);
+        if (alt) digit *= 2;
+        if (digit > 9) digit -= 9;
         sum += digit;
-        alternate = !alternate;
+        alt = !alt;
       }
-
       return sum % 10 === 0;
     }
 
-    // Generate card number from BIN
-    function generateCard(bin) {
-      let cardNumber = bin;
-      while (cardNumber.length < 15) {
-        cardNumber += Math.floor(Math.random() * 10);
-      }
-      return cardNumber + calculateCheckDigit(cardNumber);
-    }
-
-    // Calculate the Luhn check digit
-    function calculateCheckDigit(cardNumber) {
-      let sum = 0;
-      let alternate = true;
-
-      for (let i = cardNumber.length - 1; i >= 0; i--) {
-        let digit = parseInt(cardNumber[i], 10);
-
-        if (alternate) {
-          digit *= 2;
-          if (digit > 9) {
-            digit -= 9;
-          }
-        }
-
-        sum += digit;
-        alternate = !alternate;
-      }
-
-      const checkDigit = (10 - (sum % 10)) % 10;
-      return checkDigit;
-    }
-
-    // Generate random BIN
     function getRandomBin() {
-      const bins = ['411111', '555555', '601100', '379999'];
+      const bins = ["411111", "555555", "601100", "379999"];
       return bins[Math.floor(Math.random() * bins.length)];
     }
 
-    // Copy to clipboard
-    function copyToClipboard(text) {
-      navigator.clipboard.writeText(text).then(() => {
-        alert('Copied to clipboard!');
-      });
+    function getRandomMonth() {
+      return String(Math.floor(Math.random() * 12 + 1)).padStart(2, "0");
     }
 
-    // Copy all results
+    function getRandomYear() {
+      return String(Math.floor(Math.random() * 10 + 24));
+    }
+
+    function getRandomCVV() {
+      return String(Math.floor(Math.random() * 1000)).padStart(3, "0");
+    }
+
+    function generateCard(bin) {
+      let card = bin;
+      while (card.length < 15) card += Math.floor(Math.random() * 10);
+      return card + calculateCheckDigit(card);
+    }
+
+    function calculateCheckDigit(card) {
+      let sum = 0, alt = true;
+      for (let i = card.length - 1; i >= 0; i--) {
+        let digit = parseInt(card[i]);
+        if (alt) digit *= 2;
+        if (digit > 9) digit -= 9;
+        sum += digit;
+        alt = !alt;
+      }
+      return (10 - (sum % 10)) % 10;
+    }
+
+    function copy(text) {
+      navigator.clipboard.writeText(text).then(() => alert("Copied to clipboard!"));
+    }
+
     function copyAll() {
-      const resultText = Array.from(document.getElementById('result').children)
-        .map(item => item.textContent.trim())
-        .join('\n');
-      navigator.clipboard.writeText(resultText).then(() => {
-        alert('All results copied to clipboard!');
-      });
+      const resultDiv = document.getElementById("result");
+      const textToCopy = Array.from(resultDiv.children)
+        .map(item => item.textContent.split(" Copy")[0])
+        .join("\n");
+      navigator.clipboard.writeText(textToCopy).then(() => alert("All results copied!"));
     }
 
-    // Clear results
     function clearResults() {
-      document.getElementById('result').innerHTML = '';
+      document.getElementById("result").innerHTML = "";
+    }
+
+    function showError(message) {
+      document.getElementById("errorMessage").textContent = message;
+    }
+
+    function clearError() {
+      document.getElementById("errorMessage").textContent = "";
     }
   </script>
 </body>
-	</html>
- 
+</html>
