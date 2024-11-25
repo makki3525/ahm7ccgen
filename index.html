@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AHM7CCGENERATOR</title>
+  <style>
+    :root {
+      --background-color: #1a1a1a;
+      --text-color: #ffffff;
+      --button-bg: #f39c12;
+      --button-hover: #e67e22;
+      --input-bg: #2a2a2a;
+      --border-color: #f39c12;
+      --link-color: #1abc9c;
+      --link-hover-color: #16a085;
+      --error-color: #e74c3c;
+    }
+
+    .light-theme {
+      --background-color: #f7f7f7;
+      --text-color: #121212;
+      --button-bg: #3498db;
+      --button-hover: #2980b9;
+      --input-bg: #ffffff;
+      --border-color: #3498db;
+      --link-color: #2ecc71;
+      --link-hover-color: #27ae60;
+      --error-color: #c0392b;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      text-align: center;
+      padding: 20px;
+    }
+
+    header h1 {
+      margin-bottom: 20px;
+      font-size: 2rem;
+      color: var(--button-bg);
+    }
+
+    .form-group {
+      margin: 20px auto;
+      width: 90%;
+      max-width: 600px;
+      text-align: left;
+    }
+
+    input {
+      width: calc(100% - 20px);
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: var(--button-bg);
+      color: var(--text-color);
+    }
+
+    button:hover {
+      background-color: var(--button-hover);
+    }
+
+    .error {
+      color: var(--error-color);
+      margin: 10px auto;
+      text-align: center;
+    }
+
+    .result {
+      margin: 20px auto;
+      width: 90%;
+      max-width: 600px;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      text-align: left;
+      white-space: pre-wrap;
+    }
+
+    .contact-button, .link-button {
+      display: inline-block;
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      text-decoration: none;
+      border-radius: 5px;
+      background-color: var(--button-bg);
+      color: var(--text-color);
+    }
+
+    .contact-button:hover, .link-button:hover {
+      background-color: var(--button-hover);
+    }
+
+    footer {
+      margin-top: 30px;
+      border-top: 1px solid var(--border-color);
+      padding: 20px 0;
+    }
+
+    footer p, footer a {
+      margin: 10px 0;
+      color: var(--text-color);
+      font-size: 1rem;
+    }
+
+    footer a {
+      color: var(--link-color);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: var(--link-hover-color);
+    }
+
+    .instructions {
+      text-align: left;
+      margin: 20px auto;
+      padding: 15px;
+      background-color: var(--input-bg);
+      border-radius: 5px;
+      border: 1px solid var(--border-color);
+      max-width: 600px;
+    }
+
+    .instructions ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .instructions li {
+      margin-bottom: 10px;
+    }
+
+    /* Pop-up styles */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0s, opacity 0.5s ease;
+    }
+
+    .popup-overlay.show {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .popup-content {
+      background-color: white;
+      color: #121212;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      width: 300px;
+      max-width: 100%;
+    }
+
+    .popup-content h2 {
+      margin-bottom: 20px;
+    }
+
+    .popup-content a {
+      display: inline-block;
+      background-color: #25D366;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    .popup-content a:hover {
+      background-color: #128C7E;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AHM7CCGENERATOR</h1>
+  </header>
+
+  <div class="form-group">
+    <h3>Generate from BIN</h3>
+    <input type="text" id="binInput" placeholder="Enter BIN (e.g., 411111)" required maxlength="6">
+    <input type="number" id="quantityBinInput" placeholder="Quantity (1-100)" min="1" max="100">
+    <input type="text" id="monthInput" placeholder="MM (01-12)" maxlength="2">
+    <input type="number" id="yearInput" placeholder="YYYY (2025-2040)" maxlength="4">
+    <input type="text" id="cvvInput" placeholder="CVV (3-4 digits)" maxlength="4">
+    <button id="generateBinButton">Generate</button>
+  </div>
+
+  <div class="form-group">
+    <h3>Generate Random</h3>
+    <input type="number" id="quantityRandomInput" placeholder="Quantity (1-100)" min="1" max="100">
+    <button id="generateRandomButton">Generate</button>
+    <button id="clearResultsButton">Clear Results</button>
+    <button id="copyAllButton">Copy All</button>
+  </div>
+
+  <div id="errorMessage" class="error"></div>
+  <div class="result" id="result"></div>
+
+  <footer>
+    <p>Check whether the card is live or not.</p>
+    <a href="https://checker.top" target="_blank" class="contact-button">Go to Checker</a>
+    <div class="link-buttons-container">
+      <a href="https://whatsapp.com/channel/0029VaOqbIr2P59sgcIri51d" target="_blank" class="link-button">WhatsApp Channel</a>
+      <a href="https://t.me/+uDM12rJJFEtmMzBk" target="_blank" class="link-button">Telegram Channel</a>
+    </div>
+    <a href="https://t.me/TextAHM_bot" target="_blank" class="contact-button">Contact on Telegram</a>
+    <button id="toggleThemeButton">Toggle Theme</button>
+    <p>Made with Love by Muhammad Makki</p>
+    <div class="instructions">
+      <strong>Instructions:</strong>
+      <ul>
+        <li>Enter a valid BIN (at least 6 digits) or select random generation to create credit cards.</li>
+        <li>Specify the desired quantity, expiration month/year, and CVV (optional).</li>
+        <li>Click the "Generate" button to create a list of credit cards.</li>
+        <li>Once generated, copy the cards using the "Copy" buttons or "Copy All".</li>
+        <li>Click on the provided "Checker" link to verify if the cards are live or valid.</li>
+        <li>Paste the generated cards into the checker and follow the site's instructions to get results.</li>
+		<strong>Note that it's not guaranteed that all generated cards will be live. Typically, only a few cards out of ten will be live, so it's essential to check them</strong>
+	  </ul>
+    </div>
+    <p><strong>Disclaimer: Generated cards are for educational purposes only.</strong></p>
+  </footer>
+
+  <!-- Pop-up HTML -->
+  <div id="popupOverlay" class="popup-overlay">
+    <div class="popup-content">
+      <h2>Welcome to AHM7CCGENERATOR!</h2>
+      <p>We have an official WhatsApp channel. Join us now for more updates!</p>
+      <a href="https://whatsapp.com/channel/0029VaOqbIr2P59sgcIri51d" target="_blank" id="whatsappLink">Join WhatsApp Channel</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("toggleThemeButton").addEventListener("click", () => {
+      document.body.classList.toggle("light-theme");
+    });
+
+    const randomBins = [
+      "411111", "520000", "550000", "448500", "402400", 
+      "453600", "601100", "372700", "343434", "308800",
+    ];
+
+    function generateLuhn(bin, quantity) {
+      const cards = [];
+      for (let i = 0; i < quantity; i++) {
+        let card = bin;
+        while (card.length < 15) {
+          card += Math.floor(Math.random() * 10);
+        }
+        let sum = 0;
+        let flip = false;
+        for (let j = card.length - 1; j >= 0; j--) {
+          let digit = parseInt(card.charAt(j), 10);
+          if (flip) {
+            digit *= 2;
+            if (digit > 9) digit -= 9;
+          }
+          sum += digit;
+          flip = !flip;
+        }
+        card += (10 - (sum % 10)) % 10;
+        cards.push(card);
+      }
+      return cards;
+    }
+
+    function generateFromBin() {
+      const bin = document.getElementById("binInput").value.trim();
+      const quantity = parseInt(document.getElementById("quantityBinInput").value) || 10;
+      const month = document.getElementById("monthInput").value.trim();
+      const year = document.getElementById("yearInput").value.trim();
+      const cvv = document.getElementById("cvvInput").value.trim();
+
+      if (!bin || bin.length < 6) {
+        alert("BIN is mandatory and must be at least 6 digits.");
+        return;
+      }
+
+      const cards = generateLuhn(bin, quantity).map(card => {
+        const cardMonth = (month >= "01" && month <= "12") ? month : Math.floor(Math.random() * 12 + 1).toString().padStart(2, "0");
+        const cardYear = (year >= "2025" && year <= "2040") ? year : (new Date().getFullYear() + Math.floor(Math.random() * 15)).toString();
+        const cardCvv = (cvv.length >= 3 && cvv.length <= 4) ? cvv : Math.floor(Math.random() * 900 + 100).toString(); // Default CVV to 3 digits if not provided
+        return `${card}|${cardMonth}|${cardYear}|${cardCvv}`;
+      });
+
+      document.getElementById("result").innerText = cards.join("\n");
+    }
+
+    function generateRandom() {
+      const quantity = parseInt(document.getElementById("quantityRandomInput").value) || 10;
+      const randomBin = randomBins[Math.floor(Math.random() * randomBins.length)];
+      const cards = generateLuhn(randomBin, quantity).map(card => {
+        const month = Math.floor(Math.random() * 12 + 1).toString().padStart(2, "0");
+        const year = (new Date().getFullYear() + Math.floor(Math.random() * 15)).toString();
+        const cvv = Math.floor(Math.random() * 900 + 100).toString(); // Default CVV to 3 digits
+        return `${card}|${month}|${year}|${cvv}`;
+      });
+
+      document.getElementById("result").innerText = cards.join("\n");
+    }
+
+    document.getElementById("generateBinButton").addEventListener("click", generateFromBin);
+    document.getElementById("generateRandomButton").addEventListener("click", generateRandom);
+    document.getElementById("clearResultsButton").addEventListener("click", () => {
+      document.getElementById("result").innerText = "";
+    });
+    document.getElementById("copyAllButton").addEventListener("click", () => {
+      const result = document.getElementById("result").innerText;
+      if (result) {
+        navigator.clipboard.writeText(result).then(() => alert("Results copied to clipboard!"));
+      } else {
+        alert("No results to copy.");
+      }
+    });
+
+    // Show pop-up only once per user
+    if (!localStorage.getItem('popupShown')) {
+      document.getElementById('popupOverlay').classList.add('show');
+      document.getElementById('whatsappLink').addEventListener('click', () => {
+        localStorage.setItem('popupShown', 'true'); // Set flag that popup was shown
+        document.getElementById('popupOverlay').classList.remove('show');
+      });
+    }
+  </script>
+</body>
+</html>
